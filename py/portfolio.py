@@ -2,15 +2,23 @@ import functools
 import operator
 from money import Money
 
+
 class Portfolio:
     def __init__(self) -> None:
         self.moneys = []
+        self._cur_to_usd = 1.2
 
     def add(self, *moneys):
         self.moneys.extend(moneys)
-    
+
     def evaluate(self, currency):
         total = functools.reduce(
-            operator.add, map(lambda m: m.amount, self.moneys), 0
+            operator.add, map(lambda m: self.__convert(m, currency), self.moneys), 0
         )
         return Money(total, currency)
+
+    def __convert(self, money, currency):
+        if money.currency == currency:
+            return money.amount
+        else:
+            return money.amount * self._cur_to_usd
